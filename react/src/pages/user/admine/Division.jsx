@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Pagination from '@mui/material/Pagination';
+import '../../../styles/DivisionManagement.css';
 
 const apiUrl = 'http://127.0.0.1:8000/api/v1';
 
@@ -13,6 +16,8 @@ export default function AdminDivisions() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Column-specific filter states
   const [filterName, setFilterName] = useState('');
@@ -127,22 +132,19 @@ export default function AdminDivisions() {
     setEditingId(div.division_id);
   };
 
-  // Delete division
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this division?')) return;
-    try {
-      await axios.delete(`${apiUrl}/divisions/${id}`);
-      const divRes = await axios.get(`${apiUrl}/divisions`);
-      setDivisions(divRes.data);
-      setError('');
-    } catch (err) {
-      console.error('Error deleting division:', err);
-      setError('Failed to delete division');
-    }
-  };
-
   // Unique status options
   const uniqueStatuses = [...new Set(allStatuses.map(s => s.statut))];
+
+  // Handle page change
+  const handlePageChange = useCallback((event, value) => {
+    setPage(value);
+  }, []);
+
+  // Compute paged data
+  const pagedDivisions = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filteredDivisions.slice(start, start + itemsPerPage);
+  }, [filteredDivisions, page]);
 
   return (
     <div className="admin-divisions">
@@ -199,6 +201,7 @@ export default function AdminDivisions() {
           value={form.password}
           onChange={handleFormChange}
           required
+          autoComplete="current-password"
         />
         <div className="form-buttons">
           <button type="submit" className="submit-button">
@@ -232,7 +235,7 @@ export default function AdminDivisions() {
             </tr>
           </thead>
           <tbody>
-            {filteredDivisions.map(div => (
+            {pagedDivisions.map(div => (
               <tr key={div.division_id}>
                 <td>{div.division_nom}</td>
                 <td>{div.division_responsable}</td>
@@ -249,29 +252,50 @@ export default function AdminDivisions() {
                   <button className="edit-button" onClick={() => startEdit(div)}>
                     Edit
                   </button>
-                  <button className="delete-button" onClick={() => handleDelete(div.division_id)}>
-                    Delete
-                  </button>
+                 
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <Pagination
+          count={Math.ceil(filteredDivisions.length / itemsPerPage)}
+          page={page}
+          onChange={handlePageChange}
+          showFirstButton
+          showLastButton
+          sx={{ 
+            mt: 2, 
+            display: 'flex', 
+            justifyContent: 'center',
+            '& .MuiPaginationItem-root': {
+              color: '$primary',
+              '&.Mui-selected': {
+                backgroundColor: '$primary',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '$primary',
+                  opacity: 0.8
+                }
+              }
+            }
+          }}
+        />
       </div>
 
       {/* Tasks Modal */}
       {modalTasks && (
-        <div className="modal-backdrop" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="division-tasks-modal-backdrop" onClick={closeModal}>
+          <div className="division-tasks-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="division-tasks-modal-header">
               <h2>Tasks for {modalTasks.divisionName}</h2>
               <button className="close-button" onClick={closeModal}>&times;</button>
             </div>
-            <div className="modal-body">
+            <div className="division-tasks-modal-body">
               {modalTasks.tasks.length === 0 ? (
-                <div className="no-tasks">No tasks found for this division</div>
+                <div className="division-no-tasks">No tasks found for this division</div>
               ) : (
-                <table className="tasks-table">
+                <table className="division-tasks-table">
                   <thead>
                     <tr>
                       <th>Task Name</th>
@@ -301,11 +325,8 @@ export default function AdminDivisions() {
                             )}
                           </td>
                           <td>
-                            <button
-                              className="history-button"
-                              onClick={() => alert(`History for: ${task.task_name}`)}
-                            >
-                              View Details
+                            <button className="history-button">
+                              <Link to={`/app/HistoryAdmin/${task.task_id}`}>View history</Link>
                             </button>
                           </td>
                         </tr>
