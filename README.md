@@ -270,21 +270,65 @@ import { format, parseISO } from 'date-fns';
 import axios from 'axios';
 ```
 
-## Contributing
+## 🔧 Dependency Management Tips
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Maintain Consistent Versions
 
-## Code of Conduct
+```json
+// package.json
+{
+  "dependencies": {
+    "@mui/material": "7.1.0",
+    "react": "18.2.0",
+    "tailwindcss": "3.3.3",
+    "recharts": "2.8.0"
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 💡 Recommended VS Code Extensions
 
-## Security Vulnerabilities
+```bash
+# UI/UX Development
+ext install dbaeumer.vscode-eslint
+ext install esbenp.prettier-vscode
+ext install bradlc.vscode-tailwindcss
+ext install stylelint.vscode-stylelint
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# React Tooling
+ext install dsznajder.es7-react-js-snippets
+ext install planbcoding.vscode-react-refactor
+```
 
-## License
+## 🚀 Optimized Production Build
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-#   g e s t i o n _ t a c h e s 
- 
- 
+```bash
+# Build with analysis
+npm run build -- --mode production --profile
+
+# Analyze bundle size
+npx vite-bundle-visualizer
+
+# Serve production build
+npx serve -s dist
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+Made with ❤️ by [Your Name] • [Report Bug](https://github.com/VIGABANC/gestion_taches/issues)
